@@ -1,7 +1,6 @@
 import torch
 from torchvision import transforms
-from torch.utils.data import DataLoader, random_split
-from torch.utils.data.sampler import BatchSampler, RandomSampler
+from torch.utils.data import DataLoader
 import torch.nn as nn
 import wandb
 import os
@@ -21,7 +20,7 @@ wandb.init(project='inpaint', name='mobilevit-x1')
 filepath = '/data/cornucopia/jsb212/seg-dataset/all_trya_imgs'
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 batch_size = 32
-num_epochs = 100
+num_epochs = 200
 lr = 0.001
 pos_embedding = True
 normalise = False
@@ -64,10 +63,8 @@ feature_extractor = MobileViTFeatureExtractor.from_pretrained("apple/deeplabv3-m
 data = ImgMaskDataset(filepath, img_transform)
 num_samples = len(data.imgs)
 num_train = int(0.8 * num_samples)
-num_val = num_samples - num_train
-train_data, val_data = random_split(data, [num_train, num_val])
-train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, drop_last=True)
-val_loader = DataLoader(val_data, batch_size=batch_size, shuffle=True, drop_last=True)
+train_loader = DataLoader(data[:num_train], batch_size=batch_size, shuffle=True, drop_last=True)
+val_loader = DataLoader(data[num_train:], batch_size=batch_size, shuffle=True, drop_last=True)
 
 #Initialise model
 model = MobileViTForSemanticSegmentation.from_pretrained("apple/deeplabv3-mobilevit-xx-small")
@@ -100,7 +97,7 @@ model_params = model.state_dict()
 optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9995)
 
-num_iters = math.ceil(num_samples/batch_size) * num_epochs
+num_iters = math.floor(num_samples/batch_size) * num_epochs
 
 # Train the model
 loss_val = 10000
