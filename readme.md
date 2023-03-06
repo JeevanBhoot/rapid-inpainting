@@ -1,5 +1,5 @@
-## Rapid Inpainting - Engineering Master's Project
 # Enhancing Virtual Shoe Try-On with Neural Rendering
+## Rapid Inpainting - Engineering Master's Project
 
 SOTA virtual shoe try-on methods lack a desired realism. If the user’s actual shoe is longer or wider than the virtual shoe, the user’s real shoes will be visible from underneath the AR shoes, thus leading to a poor user experience.
 
