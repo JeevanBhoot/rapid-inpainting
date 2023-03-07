@@ -1,6 +1,6 @@
 import torch
 from torchvision import transforms
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Subset
 import torch.nn as nn
 import wandb
 import os
@@ -16,7 +16,7 @@ from positionalembedding import *
 
 np.random.seed(0)
 torch.manual_seed(0)
-wandb.init(project='inpaint', name='mobilevit-x1')
+wandb.init(project='inpaint', name='mobilevit-x2')
 filepath = '/data/cornucopia/jsb212/seg-dataset/all_trya_imgs'
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 batch_size = 32
@@ -63,8 +63,10 @@ feature_extractor = MobileViTFeatureExtractor.from_pretrained("apple/deeplabv3-m
 data = ImgMaskDataset(filepath, img_transform)
 num_samples = len(data.imgs)
 num_train = int(0.8 * num_samples)
-train_loader = DataLoader(data[:num_train], batch_size=batch_size, shuffle=True, drop_last=True)
-val_loader = DataLoader(data[num_train:], batch_size=batch_size, shuffle=True, drop_last=True)
+train_data = Subset(data, range(num_train))
+val_data = Subset(data, range(num_train, num_samples))
+train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, drop_last=True)
+val_loader = DataLoader(val_data, batch_size=batch_size, shuffle=True, drop_last=True)
 
 #Initialise model
 model = MobileViTForSemanticSegmentation.from_pretrained("apple/deeplabv3-mobilevit-xx-small")
