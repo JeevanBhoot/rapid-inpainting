@@ -24,4 +24,4 @@ from dataset import *
 
 # x = img_t * mask_t
 
-print(get_image_files('/data/cornucopia/jsb212/seg-dataset/test1'))
+print(get_image_files('/data/cornucopia/jsb212/seg-dataset/eval_inpaint'))

@@ -16,18 +16,19 @@ from positionalembedding import *
 
 np.random.seed(0)
 torch.manual_seed(0)
-wandb.init(project='inpaint', name='mobilevit-x2')
-filepath = '/data/cornucopia/jsb212/seg-dataset/all_trya_imgs'
+wandb.init(project='inpaint', name='mobilevit-x4')
+train_filepath = '/data/cornucopia/jsb212/seg-dataset/images_arshot'
+val_filepath = '/data/cornucopia/jsb212/seg-dataset/eval-inpaint'
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 batch_size = 32
-num_epochs = 200
+num_epochs = 500
 lr = 0.001
 pos_embedding = True
 normalise = False
 height = width = 256
 
 now = datetime.now()
-now_str = './outputs/' + now.strftime('%d-%m-%Y_%H-%M')
+now_str = './outputs/' + now.strftime('%Y-%m-%d_%H-%M')
 os.makedirs(now_str, exist_ok=True)
 os.makedirs(f'{now_str}/imgs_epochs_train', exist_ok=True)
 os.makedirs(f'{now_str}/imgs_epochs_val', exist_ok=True)
@@ -60,11 +61,9 @@ img_transform = transforms.Compose(img_transforms_lst)
 feature_extractor = MobileViTFeatureExtractor.from_pretrained("apple/deeplabv3-mobilevit-xx-small")
 
 #Load data
-data = ImgMaskDataset(filepath, img_transform)
-num_samples = len(data.imgs)
-num_train = int(0.8 * num_samples)
-train_data = Subset(data, range(num_train))
-val_data = Subset(data, range(num_train, num_samples))
+train_data = ImgMaskDataset(train_filepath, img_transform)
+val_data = ImgMaskDataset(val_filepath, img_transform)
+num_samples = len(train_data.imgs) + len(val_data)
 train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, drop_last=True)
 val_loader = DataLoader(val_data, batch_size=batch_size, shuffle=True, drop_last=True)
 
