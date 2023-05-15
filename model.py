@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from transformers import MobileViTForSemanticSegmentation
 
 class LightweightEncoderDecoder(nn.Module):
     def __init__(self):
@@ -45,12 +46,14 @@ class LightweightEncoderDecoder(nn.Module):
         return x
 
 class InpaintingHead(nn.Sequential):
+    """UNet-MobileNetV2 inpainting head"""
     def __init__(self):
         deconv = nn.ConvTranspose2d(16, 3, kernel_size=3, stride=1, padding=1, output_padding=0)
         act = nn.Tanh()
         super().__init__(deconv, act)
 
 class InpaintingHead2(nn.Sequential):
+    """Segformer inpainting head"""
     def __init__(self):
         deconv1 = nn.ConvTranspose2d(256, 3, kernel_size=3, stride=1, padding=1, output_padding=0)
         deconv2 = nn.ConvTranspose2d(3, 3, kernel_size=6, stride=4, padding=1, output_padding=0)
@@ -104,3 +107,14 @@ def initialise_model(model, device):
             nn.init.xavier_normal_(m.weight)
             #nn.init.constant_(m.bias, 0)
     model.to(device)
+
+def get_state_dict(model):
+    """Get state_dict (parameters) of model correctly
+    based on whether model is on a single GPU or 
+    distributed across several GPUs.
+    """
+    try:
+        state_dict = model.module.state_dict()
+    except AttributeError:
+        state_dict = model.state_dict()
+    return state_dict

@@ -8,5 +8,7 @@ This is rectifiable via image inpainting. A segmentation model is used to calcul
 A prototype was delivered by using Mask Aware Transformer for image inpainting. However, this large model is quite slow, and therefore not suitable for real-time (30-60fps) performance on mobile devices.
 
 This repository includes vast amounts of experimentation in developing a rapid inpainting network:
-1. UNet with MobileNetV2 encoder backbone
-2. MobileViT-XXS
+1. Custom Encoder-Decoder
+2. UNet with MobileNetV2 encoder backbone
+3. Segformer
+4. MobileViT

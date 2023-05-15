@@ -30,7 +30,7 @@ class ImgMaskDataset(torch.utils.data.Dataset):
         img = Image.open(img_path)
         img_t = self.img_transform(img)
 
-        mask = generate_random_mask(img_t.size()[1], img_t.size()[2])
+        mask = generate_random_mask(img_t.size()[1], img_t.size()[2], factor=0.3)
         mask_t = torch.tensor(mask)
 
         return img_t, mask_t
